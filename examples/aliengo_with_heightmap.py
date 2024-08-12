@@ -3,7 +3,7 @@ from gym_quadruped.sensors.heightmap import HeightMap
 from gym_quadruped.utils.mujoco.visual import render_sphere
 
 robot_name = "aliengo"   # "aliengo", "mini_cheetah", "go2", "hyqreal", ...
-scene_name = "flat"
+scene_name = "random_pyramids" #random_boxes flat
 robot_feet_geom_names = dict(FL='FL', FR='FR', RL='RL', RR='RR')
 robot_leg_joints = dict(FL=['FL_hip_joint', 'FL_thigh_joint', 'FL_calf_joint', ],  # TODO: Make configs per robot.
                         FR=['FR_hip_joint', 'FR_thigh_joint', 'FR_calf_joint', ],
@@ -28,9 +28,10 @@ obs = env.reset()
 heightmap = HeightMap(n=5,dist_x=0.1,dist_y=0.1,mjModel=env.mjModel,mjData=env.mjData)
 env.render()
 
+N_STEPS_PER_EPISODE = 1000
 while True: 
     #this fixes the base floating mid air at point 1,1,0.5
-    env.mjData.qpos[0]=1
+    env.mjData.qpos[0]=-1
     env.mjData.qpos[1]=1
     env.mjData.qpos[2]=0.5
 
@@ -50,8 +51,14 @@ while True:
                                             color=[0, 1, 0, .5],
                                             geom_id=heightmap.geom_ids[i, j])
 
-    if is_terminated:
-        pass
-        # Do some stuff
+
+    if env.step_num > N_STEPS_PER_EPISODE or is_terminated or is_truncated:
+        if is_terminated:
+            print("Environment terminated")
+        else:
+            print(f"reset {env.reset_env_counter}")
+            env.reset(random=False)
+
+
     env.render()
 env.close()
