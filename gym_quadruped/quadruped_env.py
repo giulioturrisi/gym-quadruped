@@ -113,6 +113,7 @@ class QuadrupedEnv(gym.Env):
 
         self.reset_env_counter=0
         self.scene_name = scene
+        self.scene_env = None
         
         # Random terrain generation
         if scene == 'random_boxes' or scene == 'random_pyramids':
@@ -337,7 +338,8 @@ class QuadrupedEnv(gym.Env):
         self._set_ground_friction(tangential_coeff=tangential_friction)
 
         # reset World----------------------------------------------
-        if(os.path.exists(self.model_file_path)): 
+        if(os.path.exists(self.model_file_path) and self.scene_env is not None):
+        
             #os.remove(self.model_file_path) 
             self.model_file_path = self.base_path / f'scene_flat.xml'
             if(self.scene_name == "random_boxes"):
@@ -350,15 +352,26 @@ class QuadrupedEnv(gym.Env):
                 self.scene_env = add_world_of_pyramid(self.model_file_path, init_pos=[3, 0, 0.02])
 
             self.model_file_path = self.base_path / f'scene_new.xml'
-            self.scene_env.write(self.model_file_path)
+            self.scene_env.write(self.model_file_path) # recreating random scene
 
             #Load the robot and scene to mujoco
             try:
+                self.close()
+                self.viewer = None
+                mujoco.mj_resetData(self.mjModel,self.mjData)
+                mujoco.mj_resetCallbacks()
+
+                #Update Model and Data 
                 self.mjModel: MjModel = mujoco.MjModel.from_xml_path(str(self.model_file_path))
+                self.mjData: MjData = mujoco.MjData(self.mjModel)
+
+                # MjData structure to compute and store the state of a ghost/transparent robot for visual rendering.
+                self._ghost_mjData: MjData = mujoco.MjData(self.mjModel)
+                
+            
             except ValueError as e:
                 raise ValueError(f"Error loading the scene {self.model_file_path}:") from e
         #--------------------------------------------------------------    
-
 
         self.reset_env_counter+=1
         return self._get_obs()

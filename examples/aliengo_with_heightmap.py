@@ -3,7 +3,7 @@ from gym_quadruped.sensors.heightmap import HeightMap
 from gym_quadruped.utils.mujoco.visual import render_sphere
 
 robot_name = "aliengo"   # "aliengo", "mini_cheetah", "go2", "hyqreal", ...
-scene_name = "random_pyramids" #random_boxes flat
+scene_name = "random_boxes" #random_boxes flat
 robot_feet_geom_names = dict(FL='FL', FR='FR', RL='RL', RR='RR')
 robot_leg_joints = dict(FL=['FL_hip_joint', 'FL_thigh_joint', 'FL_calf_joint', ],  # TODO: Make configs per robot.
                         FR=['FR_hip_joint', 'FR_thigh_joint', 'FR_calf_joint', ],
@@ -58,6 +58,7 @@ while True:
         else:
             print(f"reset {env.reset_env_counter}")
             env.reset(random=False)
+            env.render()
 
 
     env.render()
