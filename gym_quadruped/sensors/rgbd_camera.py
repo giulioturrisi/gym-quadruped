@@ -192,7 +192,7 @@ class Camera:
         x_camera = (i_indices - self.K[0][2]) * self._depth_plane / self.K[0][0]
         y_camera = (j_indices - self.K[1][2]) * self._depth_plane / self.K[1][1]
         self._depth_image = np.sqrt(self._depth_plane ** 2 + x_camera ** 2 + y_camera ** 2)
-        self._renderer.disable_depth_rendering()
+        self._renderer.disable_depth_rendering() 
         return self._depth_image
 
     @property
